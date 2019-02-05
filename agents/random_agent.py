@@ -2,7 +2,7 @@ import gym
 import gym_wobble
 import time
 import numpy as np
-env = gym.make('WobbleNoFrameskip-v3')
+env = gym.make('WobbleNoFrameskip-v4')
 env.reset()
 action_idx = [0, 1]
 actions = [1, -1]	# 0 means right i.e. 1, 1 means -1 i.e. left
