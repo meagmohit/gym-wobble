@@ -2,11 +2,11 @@ import gym
 import gym_wobble
 import time
 import numpy as np
-env = gym.make('WobbleNoFrameskip-v3')
+env = gym.make('WobbleNoFrameskip-v4')
 env.reset()
 action_idx = [0, 1]
 actions = [1, -1]	# 0 means right i.e. 1, 1 means -1 i.e. left
-p_err = 0.2
+p_err = 0.4
 for _ in range(1):
 	done = False
 	env.reset()
@@ -20,7 +20,7 @@ for _ in range(1):
 		(obs, reward, done, info) =  env.step(action) # take a random action
 		print actions[action], info['internal_state'], reward
 		env.render()
-		time.sleep(5.0)
+		time.sleep(0.5)
 
 print env.unwrapped.score
 env.close()
