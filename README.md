@@ -13,7 +13,7 @@ Requirements: gym with atari dependency
 ```shell
 git clone https://github.com/meagmohit/gym-wobble
 cd gym-wobble
-python setup.py install
+sudo pip install -e . #python setup.py install
 ```
 
 ```python

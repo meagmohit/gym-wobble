@@ -43,6 +43,8 @@ class WobbleEnv(gym.Env):
         self.observation_space = spaces.Box(low=0, high=255, shape=(self.atari_height, self.atari_width, 3), dtype=np.uint8)
         self.viewer = None
 
+        self._state = [-1, -1]
+
         # Code for TCP Tagging
         self.tcp_tagging = tcp_tagging
         if (self.tcp_tagging):
@@ -64,11 +66,13 @@ class WobbleEnv(gym.Env):
 
         self.time = self.time + 1
         # Updating the state, state is hidden from observation
-        [x_cursor, x_target] = self.state
+        [x_cursor, x_target] = self._state
+        prev_x_cursor = x_cursor
+        prev_x_target = x_target
         current_action = self.actions[action]
         x_cursor = min(max(x_cursor + current_action,0),19)
         # print current_action, x_cursor
-        self.state = [x_cursor, x_target]
+        self = [x_cursor, x_target]
 
         # Generating the rewards
         reward = 0.0
@@ -80,7 +84,7 @@ class WobbleEnv(gym.Env):
             if (x_target<0 or x_target>=20):
                 x_cursor = 10
                 x_target = x_cursor + (1 + np.random.randint(self.max_dist))*np.random.choice([1,-1])
-            self.state = [x_cursor, x_target]
+            self._state = [x_cursor, x_target]
 
         # Generate the done (boolean)
         done = False
@@ -90,23 +94,23 @@ class WobbleEnv(gym.Env):
         # Sending the external stimulation over TCP port
         if self.tcp_tagging:
             padding=[0]*8
-            event_id = [0, 0, 0, 0, 0, x_target, x_cursor, action]
+            event_id = [0, 0, 0, x_target, x_cursor, prev_x_target, prev_x_cursor, action]
             timestamp=list(self.to_byte(int(time()*1000), 8))
             self.s.sendall(bytearray(padding+event_id+timestamp))
 
-        return self._get_observation(), reward, done, {"ale.lives": self.ale.lives(), "internal_state": self.state}
+        return self._get_observation(), reward, done, {"ale.lives": self.ale.lives(), "internal_state": self._state}
 
     def reset(self):
         self.score = 0.0
         x_cursor = 10
         self.time = 0
         x_target = x_cursor + (1 + np.random.randint(self.max_dist))*np.random.choice([1,-1])    # picks b/w [-size to +size, except 0]
-        self.state = [x_cursor, x_target]
+        self._state = [x_cursor, x_target]
         return self._get_observation()
 
     def _get_observation(self):
         img = np.zeros(self.atari_dims, dtype=np.uint8) # Black screen
-        [x_cursor, x_target] = self.state
+        [x_cursor, x_target] = self._state
         row_mid = self.atari_height/2
         row_up = row_mid - self.block_size/2
         row_dn = row_mid + self.block_size/2
