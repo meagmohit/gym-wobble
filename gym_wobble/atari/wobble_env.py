@@ -72,7 +72,7 @@ class WobbleEnv(gym.Env):
         current_action = self.actions[action]
         x_cursor = min(max(x_cursor + current_action,0),19)
         # print current_action, x_cursor
-        self = [x_cursor, x_target]
+        self._state = [x_cursor, x_target]
 
         # Generating the rewards
         reward = 0.0

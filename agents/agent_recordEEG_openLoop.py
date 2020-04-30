@@ -15,7 +15,7 @@ for _ in range(total_play):
 	env.render()
 	time.sleep(10)
 	while not done:
-		state = env.unwrapped.state
+		state = env.unwrapped._state
 		[x_cursor, x_target] = state
 		if x_cursor < x_target:	# cursor should move right with probability of 1-p_err
 			action = np.random.choice(action_idx, p=[1-p_err, p_err])
